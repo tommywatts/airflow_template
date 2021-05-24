@@ -10,6 +10,7 @@ RUN pip install -r /requirements.txt
 
 ARG AIRFLOW_USER_HOME=/usr/local/airflow
 ENV AIRFLOW_HOME=${AIRFLOW_USER_HOME}
+ENV DAG_DIR=${AIRFLOW_USER_HOME}/dags
 
 COPY entrypoint.sh /entrypoint.sh
 COPY config/airflow.cfg ${AIRFLOW_USER_HOME}/airflow.cfg

@@ -6,3 +6,4 @@ setup(name='daggen',
       version='1.0',
       packages=['daggen'],
      )
+     

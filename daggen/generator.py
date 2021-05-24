@@ -1,11 +1,11 @@
 import yaml
 from airflow.models import DAG, BaseOperator
-from airflow.operators.python import PythonOperator
-from airflow.operators.bash import BashOperator
-from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
+from airflow.operators.python_operator import PythonOperator
+from airflow.operators.bash_operator import BashOperator
+from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
 from datetime import timedelta, datetime
 
-from daggen.utils import date_transform, import_str_module
+from daggen.utils import date_transform, import_str_module, get_python_func
 
 class DagGen:
 
@@ -24,7 +24,7 @@ class DagGen:
         if start_date:
             params['default_args']['start_date'] = date_transform(start_date)
 
-        end_date = params.get('default_args', {}).get('start_date')
+        end_date = params.get('default_args', {}).get('end_date')
         if end_date:
             params['default_args']['end_date'] = date_transform(end_date)
             
@@ -37,7 +37,8 @@ class DagGen:
         params = {k: v for k, v in config.items() if k not in ['operator', 'dependencies']}
 
         if obj == PythonOperator:
-            pass
+            params['python_callable'] = get_python_func(params['python_callable'], params['python_callable_file'])
+            del params['python_callable_file']
 
         if obj == KubernetesPodOperator:
             pass
@@ -73,6 +74,6 @@ class DagGen:
                     for dependency in task_config["dependencies"]:
                         dependency_task = task_objs[dependency]
                         source_task.set_upstream(dependency_task)
-
+        
             globals[dag_id] = dag
            
