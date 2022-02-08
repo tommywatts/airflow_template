@@ -1,0 +1,20 @@
+version: '3.7'
+services:
+    postgres:
+      image: postgres:9.5
+      environment:
+          - POSTGRES_USER=airflow
+          - POSTGRES_PASSWORD=airflow
+          - POSTGRES_DB=airflow
+
+    webserver:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      restart: always
+      depends_on:
+          - postgres
+      volumes:
+          - ./dags:/usr/local/airflow/dags
+      ports:
+          - "8080:8080"
